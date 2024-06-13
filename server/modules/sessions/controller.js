@@ -7,6 +7,7 @@ import { constants } from "../../constants.js";
 export class SessionController {
     constructor() {}
 
+    // generate new token for logged in user
     async generateNewToken(data) {
         try {
             let expiry = new Date(
@@ -19,6 +20,7 @@ export class SessionController {
                 expiry: expiry,
                 user: data.user
             };
+            // create new session
             let session = await Session.create(sessionObj);
             return { token: session.token };
         } catch (e) {
@@ -26,6 +28,7 @@ export class SessionController {
         }
     }
 
+    // check given token device combo to validate session for logged in user
     async validateSession(token, deviceId) {
         try {
             let existingSession = await Session.findOne({
@@ -33,9 +36,12 @@ export class SessionController {
                 deviceId: deviceId
             }).populate("user", "name email");
             if (existingSession) {
+                // check if the session has already expired
                 if (new Date() < existingSession.expiry) {
                     return { success: true, user: existingSession.user };
                 } else {
+                    // delete expired session
+                    await Session.deleteOne({ _id: existingSession._id });
                     return {
                         success: false,
                         message: "Your token has expired. Please re-login."

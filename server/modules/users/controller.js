@@ -14,6 +14,7 @@ export class ActivityController {
     async registerUser(req, res) {
         try {
             const { name, email, password } = req.body;
+            // check if given input data is valid or not
             const validationObj = checkProfileValidations(
                 name,
                 true,
@@ -30,6 +31,7 @@ export class ActivityController {
                 email,
                 password: generatePassword(password)
             };
+            // create new user
             await User.create(userPostData);
             return res
                 .status(200)
@@ -45,6 +47,7 @@ export class ActivityController {
     async loginUser(req, res) {
         try {
             const { email, password, device } = req.body;
+            // check if given input data is valid or not
             const validationObj = checkProfileValidations(
                 "",
                 false,
@@ -56,12 +59,14 @@ export class ActivityController {
             if (!validationObj.success) {
                 return res.status(400).json({ message: validationObj.error });
             }
+            // get user data based on email id provided
             const userData = await User.findOne({ email: email });
             if (!userData) {
                 return res.status(400).json({
                     message: "You have provided invalid login credentials."
                 });
             }
+            // check if password given is correct or not
             const flag = comparePasswords(password, userData.password);
             if (!flag) {
                 return res.status(400).json({
@@ -87,8 +92,9 @@ export class ActivityController {
 
     async getUserProfile(req, res) {
         try {
-            const { name } = req.user;
-            return res.status(200).json({ name });
+            // return the name of the logged in user
+            const { name, email } = req.user;
+            return res.status(200).json({ name, email });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res

@@ -2,7 +2,6 @@ export class ErrorClass {
     constructor() {}
 
     getError(error) {
-        // eslint-disable-next-line
         console.log(error);
         let message = "";
         let heading = "";
