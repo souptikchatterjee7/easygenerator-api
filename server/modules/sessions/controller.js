@@ -7,25 +7,22 @@ import { constants } from "../../constants.js";
 export class SessionController {
     constructor() {}
 
-    async generateNewToken(req, res) {
+    async generateNewToken(data) {
         try {
             let expiry = new Date(
                 new Date().getTime() +
                     constants.tokenValidityDays * 24 * 60 * 60 * 1000
             );
             let sessionObj = {
-                deviceId: req.body.deviceId,
+                deviceId: data.deviceId,
                 token: uuidv4(),
                 expiry: expiry,
-                user: req.body.user
+                user: data.user
             };
             let session = await Session.create(sessionObj);
-            return res.status(200).json({ token: session.token });
+            return { token: session.token };
         } catch (e) {
-            error.getError(e);
-            return res
-                .status(401)
-                .json({ message: "Invalid credentials provided." });
+            throw e;
         }
     }
 

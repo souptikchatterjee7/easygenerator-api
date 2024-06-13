@@ -1,10 +1,12 @@
 import User from "./schema.js";
 import { ErrorClass } from "../../handlers/error.js";
 const error = new ErrorClass();
-import { checkRegisterValidations } from "../../handlers/shared.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { constants } from "../../constants.js";
+import {
+    checkProfileValidations,
+    comparePasswords,
+    generatePassword
+} from "../../handlers/shared.js";
+import { SessionController } from "../sessions/controller.js";
 
 export class ActivityController {
     constructor() {}
@@ -12,20 +14,21 @@ export class ActivityController {
     async registerUser(req, res) {
         try {
             const { name, email, password } = req.body;
-            const validationObj = checkRegisterValidations(
+            const validationObj = checkProfileValidations(
                 name,
+                true,
                 email,
-                password
+                password,
+                null,
+                false
             );
             if (!validationObj.success) {
                 return res.status(400).json({ message: validationObj.error });
             }
-            const salt = bcrypt.genSaltSync(constants.bycryptSaltRounds);
-            const hash = bcrypt.hashSync(password, salt);
             const userPostData = {
                 name,
                 email,
-                password: hash
+                password: generatePassword(password)
             };
             await User.create(userPostData);
             return res
@@ -41,7 +44,39 @@ export class ActivityController {
 
     async loginUser(req, res) {
         try {
-            // code goes here
+            const { email, password, device } = req.body;
+            const validationObj = checkProfileValidations(
+                "",
+                false,
+                email,
+                password,
+                device,
+                true
+            );
+            if (!validationObj.success) {
+                return res.status(400).json({ message: validationObj.error });
+            }
+            const userData = await User.findOne({ email: email });
+            if (!userData) {
+                return res.status(400).json({
+                    message: "You have provided invalid login credentials."
+                });
+            }
+            const flag = comparePasswords(password, userData.password);
+            if (!flag) {
+                return res.status(400).json({
+                    message: "You have provided invalid login credentials."
+                });
+            }
+            const tokenPostBody = {
+                deviceId: device,
+                user: userData._id
+            };
+            const sessionController = new SessionController();
+            const tokenObj = await sessionController.generateNewToken(
+                tokenPostBody
+            );
+            return res.status(200).json({ token: tokenObj.token });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res

@@ -1,3 +1,6 @@
+import bcrypt from "bcrypt";
+import { constants } from "../constants.js";
+
 export function validateEmailId(email) {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/;
     return regex.test(email);
@@ -14,13 +17,22 @@ export function validatePassword(password) {
     return regex.test(password);
 }
 
-export function checkRegisterValidations(name, email, password) {
-    if (name && name !== "") {
-        if (!validateName(name)) {
-            return { success: false, error: "Please provide valid name." };
+export function checkProfileValidations(
+    name,
+    isNameNeeded,
+    email,
+    password,
+    device,
+    isDeviceNeeded
+) {
+    if (isNameNeeded) {
+        if (name && name !== "") {
+            if (!validateName(name)) {
+                return { success: false, error: "Please provide valid name." };
+            }
+        } else {
+            return { success: false, error: "Please provide your name." };
         }
-    } else {
-        return { success: false, error: "Please provide your name." };
     }
     if (email && email !== "") {
         if (!validateEmailId(email)) {
@@ -39,5 +51,23 @@ export function checkRegisterValidations(name, email, password) {
     } else {
         return { success: false, error: "Please provide your password." };
     }
+    if (isDeviceNeeded) {
+        if (!device || device === "") {
+            return {
+                success: false,
+                error: "Please provide your device Id."
+            };
+        }
+    }
     return { success: true, error: "" };
+}
+
+export function comparePasswords(password, hash) {
+    return bcrypt.compareSync(password, hash);
+}
+
+export function generatePassword(password) {
+    const salt = bcrypt.genSaltSync(constants.bycryptSaltRounds);
+    const hash = bcrypt.hashSync(password, salt);
+    return hash;
 }

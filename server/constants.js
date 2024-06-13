@@ -7,5 +7,5 @@ export const config = configuration[environment];
 
 export const constants = {
     tokenValidityDays: 30,
-    bycryptSaltRounds: 16
+    bycryptSaltRounds: 13
 };
