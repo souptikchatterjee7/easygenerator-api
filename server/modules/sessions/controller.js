@@ -33,7 +33,7 @@ export class SessionController {
                 deviceId: deviceId
             }).populate("user", "name email");
             if (existingSession) {
-                if (new Date() < existingSession.token) {
+                if (new Date() < existingSession.expiry) {
                     return { success: true, user: existingSession.user };
                 } else {
                     return {

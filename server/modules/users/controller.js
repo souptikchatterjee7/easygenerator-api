@@ -87,7 +87,8 @@ export class ActivityController {
 
     async getUserProfile(req, res) {
         try {
-            // code goes here
+            const { name } = req.user;
+            return res.status(200).json({ name });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res
