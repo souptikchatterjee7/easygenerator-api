@@ -5,6 +5,7 @@
 # To setup codebase -
 
 # 1. npm ci
+# 2. to connect with DB, copy .env file sent via email to project root folder.
 
 # To start in dev env -
 
