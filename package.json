@@ -1,0 +1,49 @@
+{
+    "name": "easygenerator-api",
+    "version": "1.00.00",
+    "description": "API Server for EasyGenerator",
+    "main": "server/app.js",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon server/app.js",
+        "start:stg": "node server/app.js stg",
+        "start:prod": "node server/app.js prod",
+        "prepare": "husky install .husky",
+        "lint": "npx eslint server/",
+        "pretty": "npx pretty-quick --staged",
+        "prettify": "prettier --write .",
+        "lintify": "npm run lint -- --fix",
+        "fix": "npm run prettify && npm run lintify",
+        "pre-commit": "npm run pretty && npm run lint"
+    },
+    "author": "Souptik Chatterjee",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.7.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^7.0.0",
+        "nodemon": "^2.0.22",
+        "socket.io": "^4.6.1",
+        "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.13",
+        "@types/express": "^4.17.17",
+        "@types/jsonwebtoken": "^9.0.1",
+        "@types/uuid": "^9.0.1",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-prettier": "^4.2.1",
+        "husky": "^8.0.3",
+        "prettier": "^2.8.4",
+        "pretty-quick": "^3.1.3"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run pre-commit"
+        }
+    }
+}
