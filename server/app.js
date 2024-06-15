@@ -10,9 +10,9 @@ import "dotenv/config";
 
 const mongoUri =
     "mongodb+srv://" +
-    process.env.USERNAME +
+    process.env.DB_USERNAME +
     ":" +
-    process.env.PASSWORD +
+    process.env.DB_PASSWORD +
     "@" +
     config.mongo.dbConnect +
     "/" +
