@@ -26,8 +26,7 @@ export function checkProfileValidations(
     isNameNeeded,
     email,
     password,
-    device,
-    isDeviceNeeded
+    device
 ) {
     // name is not needed for login validation
     if (isNameNeeded) {
@@ -56,14 +55,11 @@ export function checkProfileValidations(
     } else {
         return { success: false, error: "Please provide your password." };
     }
-    // device is not needed for registration validation
-    if (isDeviceNeeded) {
-        if (!device || device === "") {
-            return {
-                success: false,
-                error: "Please provide your device Id."
-            };
-        }
+    if (!device || device === "") {
+        return {
+            success: false,
+            error: "Please provide your device Id."
+        };
     }
     return { success: true, error: "" };
 }

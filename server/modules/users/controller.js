@@ -13,15 +13,14 @@ export class ActivityController {
 
     async registerUser(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, device } = req.body;
             // check if given input data is valid or not
             const validationObj = checkProfileValidations(
                 name,
                 true,
                 email,
                 password,
-                null,
-                false
+                device
             );
             if (!validationObj.success) {
                 return res.status(400).json({ message: validationObj.error });
@@ -32,10 +31,19 @@ export class ActivityController {
                 password: generatePassword(password)
             };
             // create new user
-            await User.create(userPostData);
+            const userData = await User.create(userPostData);
+            // generate token of logged in user
+            const tokenPostBody = {
+                deviceId: device,
+                user: userData._id
+            };
+            const sessionController = new SessionController();
+            const tokenObj = await sessionController.generateNewToken(
+                tokenPostBody
+            );
             return res
                 .status(200)
-                .json({ message: "You have been registered succesfully." });
+                .json({ token: tokenObj.token, user: { name, email } });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res
@@ -53,14 +61,13 @@ export class ActivityController {
                 false,
                 email,
                 password,
-                device,
-                true
+                device
             );
             if (!validationObj.success) {
                 return res.status(400).json({ message: validationObj.error });
             }
             // get user data based on email id provided
-            const userData = await User.findOne({ email: email });
+            const userData = await User.findOne({ email: email }, { name: 1 });
             if (!userData) {
                 return res.status(400).json({
                     message: "You have provided invalid login credentials."
@@ -73,6 +80,7 @@ export class ActivityController {
                     message: "You have provided invalid login credentials."
                 });
             }
+            // generate token of logged in user
             const tokenPostBody = {
                 deviceId: device,
                 user: userData._id
@@ -81,7 +89,10 @@ export class ActivityController {
             const tokenObj = await sessionController.generateNewToken(
                 tokenPostBody
             );
-            return res.status(200).json({ token: tokenObj.token });
+            return res.status(200).json({
+                token: tokenObj.token,
+                user: { name: userData.name, email }
+            });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res
