@@ -25,6 +25,13 @@ export class ActivityController {
             if (!validationObj.success) {
                 return res.status(400).json({ message: validationObj.error });
             }
+            // check if user with same email exists
+            const oldUser = await User.findOne({ email });
+            if (oldUser) {
+                return res
+                    .status(400)
+                    .json({ message: "Use with same email already exists." });
+            }
             const userPostData = {
                 name,
                 email,
@@ -67,7 +74,7 @@ export class ActivityController {
                 return res.status(400).json({ message: validationObj.error });
             }
             // get user data based on email id provided
-            const userData = await User.findOne({ email: email }, { name: 1 });
+            const userData = await User.findOne({ email: email });
             if (!userData) {
                 return res.status(400).json({
                     message: "You have provided invalid login credentials."
