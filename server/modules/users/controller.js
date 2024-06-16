@@ -48,9 +48,7 @@ export class ActivityController {
             const tokenObj = await sessionController.generateNewToken(
                 tokenPostBody
             );
-            return res
-                .status(200)
-                .json({ token: tokenObj.token, user: { name, email } });
+            return res.status(200).json({ token: tokenObj.token });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
             return res
@@ -97,8 +95,7 @@ export class ActivityController {
                 tokenPostBody
             );
             return res.status(200).json({
-                token: tokenObj.token,
-                user: { name: userData.name, email }
+                token: tokenObj.token
             });
         } catch (e) {
             const { status, message, heading } = error.getError(e);
